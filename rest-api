@@ -1,0 +1,26 @@
+{
+    "name": "sql-server-connector",
+    "config": {
+        "connector.class": "io.debezium.connector.sqlserver.SqlServerConnector",
+        "database.hostname": "mssql_db",
+        "database.port": "1433",
+        "database.user": "sa",
+        "database.password": "YourStrong!Passw0rd",
+        "database.dbname": "testdb",
+        "database.server.name": "sqlserver",
+        "table.include.list": "dbo.Orders_MSSQL",
+        "database.history.kafka.bootstrap.servers": "kafka:29092",
+        "database.history.kafka.topic": "dbhistory.sql-server-cdc",
+        "database.history.kafka.recovery.poll.interval.ms": "5000",
+        "database.history.kafka.recovery.attempts": "4",
+        "tasks.max": "1",
+        "database.encrypt": "true",
+        "database.trustServerCertificate": "true",
+        "database.applicationName": "Debezium",
+        "snapshot.mode": "initial",
+        "topic.creation.default.replication.factor": 1,
+        "topic.creation.default.partitions": 1,
+        "topic.creation.enable": true
+    }
+}
+
