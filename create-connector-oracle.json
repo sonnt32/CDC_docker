@@ -4,9 +4,9 @@
     "connector.class": "io.debezium.connector.jdbc.JdbcSinkConnector",
 
     "connection.url": "jdbc:oracle:thin:@//oracle-db:1521/xepdb1",
-    "connection.username": "CDC_USER",          // ← dùng lại username
+    "connection.username": "CDC_USER",          // ← user_name created 
     "connection.password": "MyOraclePwd123",
-    "jdbc.driver": "oracle.jdbc.OracleDriver",  // ← khai báo driver
+    "jdbc.driver": "oracle.jdbc.OracleDriver",  // ← driver.jar
 
     "topics": "sqlserver.Test_DB.dbo.employee",
     "table.name.format": "SQLSERVER_DBO_EMPLOYEE",
@@ -24,7 +24,7 @@
     "transforms.unwrap.drop.tombstones": "true",
     "transforms.unwrap.delete.handling.mode": "none",
 
-    /* ── JSON converter, giữ schema ── */
+    /* ── JSON Convert ── */
     "key.converter": "org.apache.kafka.connect.json.JsonConverter",
     "value.converter": "org.apache.kafka.connect.json.JsonConverter",
     "key.converter.schemas.enable": "false",
@@ -33,3 +33,4 @@
     "tasks.max": "1"
   }
 }
+
