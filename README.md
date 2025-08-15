@@ -48,8 +48,24 @@ docker compose ps
 4. Check logs (optional):
 docker compose logs -f
 
+## 4. Create Database SQL SERVER demo and enable CDC 
 
-## 4. Create Oracle user
+```bash
+docker exec -it mssql /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong!Passw0rd' -Q "
+CREATE DATABASE Test_DB;
+USE Test_DB;
+CREATE TABLE dbo.employee(
+  id INT IDENTITY(1001,1) PRIMARY KEY,
+  first_name VARCHAR(255),
+  last_name  VARCHAR(255),
+  email      VARCHAR(255) UNIQUE);
+EXEC sys.sp_cdc_enable_db;
+EXEC sys.sp_cdc_enable_table @source_schema='dbo',@source_name='employee',@role_name=NULL;"
+```
+
+
+
+## 5. Create Oracle user
 
 **Demo**
 ```bash
@@ -99,7 +115,7 @@ EOF
 
 
 
-## 5. Once all containers are up and running, you can test the REST API using **Postman**.
+## 6. Once all containers are up and running, you can test the REST API using **Postman**.
 
 1. **Open Postman**.
 2. Create a new request.
@@ -111,7 +127,7 @@ Or can using curl to create connectors, example:
 1. curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" --data-binary @connectors/mssql-source.json
 2. curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" --data-binary @connectors/oracle-sink.json
 
-## 6. Additional Notes
+## 7. Additional Notes
 - Update `.env` file before starting services if needed.
 - Make sure ports in `docker-compose.yml` are not used by other applications.
 - If any container fails to start, check its logs with: docker compose logs <service-name>
