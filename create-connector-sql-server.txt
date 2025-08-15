@@ -1,0 +1,31 @@
+{
+  "name": "mssql-source",
+  "config": {
+    "connector.class": "io.debezium.connector.sqlserver.SqlServerConnector",
+    "tasks.max": "1",
+
+    /* ---------- SQLSERVER Connector ---------- */
+    "database.hostname": "sql-server",          
+    "database.port": "1433",
+    "database.user": "sa",
+    "database.password": "YourStrong!Passw0rd",
+
+    /* ---------- Database name + Table ---------- */
+    "database.names": "Test_DB",               
+    "table.include.list": "dbo.employee",
+
+    /* ---------- Server name ---------- */
+    "database.server.name": "sqlserver",        
+    "topic.prefix": "sqlserver",
+
+   
+    "snapshot.mode": "initial",                 
+    "database.encrypt": "false",                
+    "database.trustServerCertificate": "true",
+
+    
+    "schema.history.internal.kafka.bootstrap.servers": "kafka:29092",
+    "schema.history.internal.kafka.topic": "schemahistory.sqlserver"
+  }
+
+}
