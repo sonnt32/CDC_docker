@@ -1,0 +1,30 @@
+{
+  "name": "mssql-source1",
+  "config": {
+    "connector.class": "io.debezium.connector.sqlserver.SqlServerConnector",
+    "tasks.max": "1",
+
+    /* ---------- Kết nối SQL Server ---------- */
+    "database.hostname": "sql-server",          // tên service trong docker-compose
+    "database.port": "1433",
+    "database.user": "sa",
+    "database.password": "YourStrong!Passw0rd",
+
+    /* ---------- DB & bảng cần CDC ---------- */
+    "database.names": "Test_DB",                // CDC đã bật cấp DB
+    "table.include.list": "dbo.employee",
+
+    /* ---------- Tên server logic & topic ---------- */
+    "database.server.name": "sqlserver",        // sẽ thành prefix topic
+    "topic.prefix": "sqlserver",
+
+    /* ---------- Khởi tạo & encryption ---------- */
+    "snapshot.mode": "initial",                 // lần đầu lấy full + CDC log
+    "database.encrypt": "false",                // container MSSQL không bật SSL
+    "database.trustServerCertificate": "true",
+
+    /* ---------- Lưu lịch sử schema ---------- */
+    "schema.history.internal.kafka.bootstrap.servers": "kafka:29092",
+    "schema.history.internal.kafka.topic": "schemahistory.sqlserver"
+  }
+}
