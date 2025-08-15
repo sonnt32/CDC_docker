@@ -45,7 +45,7 @@ Once all containers are up and running, you can test the REST API using **Postma
 1. **Open Postman**.
 2. Create a new request.
 3. Select the appropriate HTTP method (e.g., GET, POST, PUT, DELETE).
-4. Set the request URL according to the service configuration.
+4. Run the connector using **create-connector-oracle.json** to connect Oracle to Kafka, and **create-connector-sql-server.json** to connect MS SQL Server to Kafka.
 
 ## 5. Stopping the Services
 To stop and remove containers:
