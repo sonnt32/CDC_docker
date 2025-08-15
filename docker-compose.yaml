@@ -1,0 +1,99 @@
+services:
+  # ────────── ZooKeeper ──────────
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks: [kafka-net]
+
+  # ────────── Kafka Broker ───────
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    depends_on: [zookeeper]
+    ports:
+      - "9092:9092"                        # cổng cho host
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      # 2 listener: nội bộ (29092) & host (9092)
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks: [kafka-net]
+
+  # ────────── SQL Server (CDC) ───
+  sql-server:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssql
+    environment:
+      SA_PASSWORD: "YourStrong!Passw0rd"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_AGENT_ENABLED: "TRUE"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+    networks: [kafka-net]
+
+  # ────────── Oracle XE ──────────
+  oracle-db:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: oracledb
+    environment:
+      ORACLE_PASSWORD: "MyOraclePwd123"
+    ports:
+      - "1521:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    networks: [kafka-net]
+
+  # ────────── Kafka Connect (Debezium) ──────
+  kafka-connect:
+    image: debezium/connect:2.6.2.Final      # ← không cần build
+    container_name: kafka-connect
+    depends_on: [kafka, sql-server]
+    ports:
+      - "8083:8083"                          # REST API
+    environment:
+      BOOTSTRAP_SERVERS: kafka:29092
+      GROUP_ID: connect-cluster
+      CONFIG_STORAGE_TOPIC: connect-configs
+      OFFSET_STORAGE_TOPIC: connect-offsets
+      STATUS_STORAGE_TOPIC: connect-statuses
+
+      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      KEY_CONVERTER_SCHEMAS_ENABLE: "false"
+      VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+
+      # nạp thêm driver (ojdbc.jar, xstreams.jar) nếu cần
+      KAFKA_CONNECT_PLUGIN_PATH: /kafka/connect,/kafka/custom-jars
+      KAFKA_CONNECT_HEAP: "-Xms256M -Xmx1G"
+    volumes:
+      - ./drivers:/kafka/custom-jars         # place Oracle JARs vào ./drivers
+    networks: [kafka-net]
+
+  # ────────── Kafka UI ───────────
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "8080:8080"
+    depends_on: [kafka, kafka-connect]
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_KAFKACONNECT_0_NAME: connect
+      KAFKA_CLUSTERS_0_KAFKACONNECT_0_ADDRESS: http://kafka-connect:8083
+    networks: [kafka-net]
+
+# ────────── volumes & network ─────────
+volumes:
+  mssql-data:
+  oracle-data:
+
+networks:
+  kafka-net:
+    driver: bridge
