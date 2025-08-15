@@ -127,7 +127,15 @@ Or can using curl to create connectors, example:
 1. curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" --data-binary @connectors/mssql-source.json
 2. curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" --data-binary @connectors/oracle-sink.json
 
-## 7. Additional Notes
+## 7. Run task
+
+```bash
+docker compose up -d --build
+```
+
+
+## 8.Additional Notes
 - Update `.env` file before starting services if needed.
 - Make sure ports in `docker-compose.yml` are not used by other applications.
 - If any container fails to start, check its logs with: docker compose logs <service-name>
+- 
