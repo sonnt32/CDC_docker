@@ -138,4 +138,4 @@ docker compose up -d --build
 - Update `.env` file before starting services if needed.
 - Make sure ports in `docker-compose.yml` are not used by other applications.
 - If any container fails to start, check its logs with: docker compose logs <service-name>
-- 
+- Verify that all relevant connector settings are correct, such as the source database, target database, container name, password, **docker network**, and ensure you understand the unwrap method for Kafka to function properly
