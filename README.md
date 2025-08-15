@@ -27,7 +27,12 @@ project-root/
 └── drivers/
     └── ojdbc11
 ```
-     
+``` bash
+directory mount driver Oracle (if you can)
+
+RUN mkdir -p /kafka/connect/jars
+ENV CONNECT_PLUGIN_PATH="/kafka/connect/jars,/usr/share/java"
+```
 
 ## 3. Setup Instructions
 1. Clone the repository:
