@@ -15,6 +15,8 @@ docker compose version
 git --version
 
 ## 2. Directory Structure
+
+```plaintext
 project-root/
 ├── docker-compose.yml       # Docker Compose configuration
 ├── README.md                 # This setup guide
@@ -22,12 +24,15 @@ project-root/
 │   ├── create-connector-oracle.json
 │   ├── create-connector-sql-server.json
 │   └── ...
-└── drivers/ojdbc11        
+└── drivers/
+    └── ojdbc11
+```
+     
 
 ## 3. Setup Instructions
 1. Clone the repository:
-git clone <your-repo-url>
-cd project-root
+git clone https://github.com/sonnt32/CDC_docker
+cd CDC_docker
 
 2. Build and start services:
 docker compose up -d --build
