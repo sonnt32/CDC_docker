@@ -19,10 +19,10 @@ project-root/
 ├── docker-compose.yml       # Docker Compose configuration
 ├── README.md                 # This setup guide
 ├── restapi/                  # REST API source code
-│   ├── app.py
-│   ├── requirements.txt
+│   ├── create-connector-oracle.json
+│   ├── create-connector-sql-server.json
 │   └── ...
-└── other-components/         # Additional services or configs
+└── drivers/ojdbc11        
 
 ## 3. Setup Instructions
 1. Clone the repository:
@@ -38,9 +38,56 @@ docker compose ps
 4. Check logs (optional):
 docker compose logs -f
 
-## 4. REST API Usage
 
-Once all containers are up and running, you can test the REST API using **Postman**.
+## 4. Create Oracle user
+**demo**
+docker exec -it oracledb bash
+
+source /etc/profile
+sqlplus / as sysdba
+
+ALTER SESSION SET CONTAINER = XEPDB1;
+ALTER SESSION SET "_oracle_script" = TRUE;
+
+BEGIN
+  EXECUTE IMMEDIATE 'DROP USER CDC_USER CASCADE';
+EXCEPTION WHEN OTHERS THEN
+  IF SQLCODE != -01918 THEN RAISE; END IF;
+END;
+/
+
+CREATE USER CDC_USER IDENTIFIED BY "MyOraclePwd123"
+  DEFAULT TABLESPACE users
+  TEMPORARY TABLESPACE temp
+  QUOTA UNLIMITED ON users;
+
+GRANT CONNECT, RESOURCE TO CDC_USER;
+GRANT CREATE TABLE, CREATE SEQUENCE, DROP ANY TABLE TO CDC_USER;
+GRANT INSERT ANY TABLE, UPDATE ANY TABLE, DELETE ANY TABLE TO CDC_USER;
+GRANT SELECT ANY TABLE TO CDC_USER;
+GRANT UNLIMITED TABLESPACE TO CDC_USER;
+
+COMMIT;
+EXIT;
+
+
+# 2) CDC_USER: create target table
+sqlplus -s CDC_USER/"MyOraclePwd123"@XEPDB1 <<'SQL2'
+CREATE TABLE SQLSERVER_DBO_EMPLOYEE (
+  ID         NUMBER         PRIMARY KEY,
+  FIRST_NAME VARCHAR2(255),
+  LAST_NAME  VARCHAR2(255),
+  EMAIL      VARCHAR2(255)
+);
+COMMIT;
+EXIT;
+SQL2
+EOF
+
+
+
+
+## 5. Once all containers are up and running, you can test the REST API using **Postman**.
 
 1. **Open Postman**.
 2. Create a new request.
@@ -51,14 +98,6 @@ Or can using curl to create connectors, example:
 
 1. curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" --data-binary @connectors/mssql-source.json
 2. curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" --data-binary @connectors/oracle-sink.json
-
-
-## 5. Stopping the Services
-To stop and remove containers:
-docker compose down
-
-To stop but keep containers:
-docker compose stop
 
 ## 6. Additional Notes
 - Update `.env` file before starting services if needed.
