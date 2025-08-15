@@ -47,6 +47,12 @@ Once all containers are up and running, you can test the REST API using **Postma
 3. Select the appropriate HTTP method (e.g., GET, POST, PUT, DELETE).
 4. Run the connector using **create-connector-oracle.json** to connect Oracle to Kafka, and **create-connector-sql-server.json** to connect MS SQL Server to Kafka.
 
+Or can using curl to create connectors, example:
+
+1. curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" --data-binary @connectors/mssql-source.json
+2. curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" --data-binary @connectors/oracle-sink.json
+
+
 ## 5. Stopping the Services
 To stop and remove containers:
 docker compose down
