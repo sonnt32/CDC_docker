@@ -98,8 +98,10 @@ GRANT UNLIMITED TABLESPACE TO CDC_USER;
 COMMIT;
 EXIT;
 ```
-``` bash
 create target table
+
+``` bash
+
 sqlplus -s CDC_USER/"MyOraclePwd123"@XEPDB1 <<'SQL2'
 CREATE TABLE SQLSERVER_DBO_EMPLOYEE (
   ID         NUMBER         PRIMARY KEY,
